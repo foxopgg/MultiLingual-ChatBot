@@ -7,74 +7,133 @@
     <title>Exam Paper Generator Chatbot</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #eef2f7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-        #chatbox {
-            width: 500px;
-            margin: auto;
-            background: white;
+
+        #chat-container {
+            background: #fff;
+            width: 600px;
+            max-width: 90%;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #header {
+            background: #0052cc;
+            color: white;
             padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px #aaa;
+            text-align: center;
+            font-size: 1.5em;
         }
+
+        #messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 400px;
+        }
+
         .message {
             padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
+            margin: 8px 0;
+            border-radius: 8px;
+            max-width: 80%;
+            word-wrap: break-word;
         }
+
         .user {
-            background: #d1ffd1;
-            text-align: right;
+            background: #d0eaff;
+            align-self: flex-end;
         }
+
         .bot {
             background: #f1f1f1;
-            text-align: left;
+            align-self: flex-start;
         }
-        input, button {
-            padding: 10px;
-            margin-top: 10px;
-            width: 100%;
-            font-size: 16px;
+
+        #input-area {
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+
+        #userInput {
+            flex-grow: 1;
+            padding: 15px;
+            border: none;
+            font-size: 1em;
+        }
+
+        #sendButton {
+            background: #0052cc;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        #sendButton:hover {
+            background: #003d99;
         }
     </style>
 </head>
 
 <body>
-    <h2 style="text-align:center;">Exam Paper Generator Chatbot</h2>
-    <div id="chatbox">
+    <div id="chat-container">
+        <div id="header">📚 Exam Paper Generator Chatbot</div>
+
         <div id="messages"></div>
-        <input type="text" id="userInput" placeholder="Type your message here..." />
-        <button onclick="sendMessage()">Send</button>
+
+        <div id="input-area">
+            <input type="text" id="userInput" placeholder="Type your message..." />
+            <button id="sendButton" onclick="sendMessage()">Send</button>
+        </div>
     </div>
 
     <script>
         async function sendMessage() {
-            const userInput = document.getElementById('userInput').value;
-            if (!userInput.trim()) return;
+            const userInput = document.getElementById('userInput').value.trim();
+            if (!userInput) return;
 
             addMessage(userInput, 'user');
             document.getElementById('userInput').value = '';
 
-            // Call backend API
-            const response = await fetch('http://localhost:5000/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: userInput })
-            });
+            try {
+                const response = await fetch('http://localhost:5000/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: userInput })
+                });
 
-            const data = await response.json();
-            addMessage(data.reply, 'bot');
+                const data = await response.json();
+                addMessage(data.reply, 'bot');
+            } catch (error) {
+                addMessage('⚠️ Server error. Please try again later.', 'bot');
+            }
         }
 
         function addMessage(text, sender) {
             const msgDiv = document.createElement('div');
-            msgDiv.className = 'message ' + sender;
+            msgDiv.className = `message ${sender}`;
             msgDiv.textContent = text;
             document.getElementById('messages').appendChild(msgDiv);
-            msgDiv.scrollIntoView();
+            msgDiv.scrollIntoView({ behavior: 'smooth' });
         }
+
+        // Allow Enter key to send message
+        document.getElementById('userInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendMessage();
+        });
     </script>
 </body>
 
