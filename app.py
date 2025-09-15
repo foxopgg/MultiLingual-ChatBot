@@ -1,15 +1,18 @@
-from flask import Flask, request, jsonify
-from main import load_pdf, clean_text, generate_questions, save_to_pdf  # Import your functions
+from flask import Flask, request, jsonify, send_from_directory
+from main import load_pdf, clean_text, generate_questions, save_to_pdf
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='frontend')
+
+@app.route("/")
+def index():
+    return send_from_directory('frontend', 'index.html')
 
 @app.route("/chat", methods=["POST"])
 def chat():
     user_msg = request.json.get('message')
 
-    # Example flow: Ask for difficulty first, then generate paper
     if "generate" in user_msg.lower():
-        difficulty = "easy"  # You could parse the user's message here or store state
+        difficulty = "easy"  # Could parse message later
         syllabus_path = "data/Syllabus.pdf"
         raw_text = load_pdf(syllabus_path)
         syllabus_text = clean_text(raw_text)
@@ -34,7 +37,7 @@ SECTION C (15 marks × 1 = 15 marks)
 {secC}
 """
         save_to_pdf("Question_Paper.pdf", final_paper)
-        reply = "✅ Question paper has been generated as 'Question_Paper.pdf'."
+        reply = "✅ Question paper generated as 'Question_Paper.pdf'."
     else:
         reply = "Hello! Type 'generate exam paper' to create a new paper."
 

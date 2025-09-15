@@ -62,7 +62,6 @@ def save_to_pdf(filename, content):
     width, height = A4
     y = height - 50
     left_margin = 50
-    max_width = width - 100
     wrapper = textwrap.TextWrapper(width=100)
 
     for paragraph in content.split("\n\n"):
@@ -78,23 +77,15 @@ def save_to_pdf(filename, content):
     c.save()
 
 # -------------------------
-# 4. Main Program
+# 4. Generate Exam Paper (API Use)
 # -------------------------
-if __name__ == "__main__":
+def generate_exam_paper(difficulty="easy"):
     syllabus_path = "data/Syllabus.pdf"
-    difficulty = input("⚡ Difficulty (easy / medium / hard / mixed): ")
-
-    print("⏳ Loading syllabus...")
     raw_text = load_pdf(syllabus_path)
     syllabus_text = clean_text(raw_text)
 
-    print("🤖 Generating Section A (10 × 2 marks)...")
     secA = generate_questions("Section A", syllabus_text, 10, 2, difficulty)
-
-    print("🤖 Generating Section B (5 × 13 marks)...")
     secB = generate_questions("Section B", syllabus_text, 5, 13, difficulty)
-
-    print("🤖 Generating Section C (1 × 15 marks)...")
     secC = generate_questions("Section C", syllabus_text, 1, 15, difficulty)
 
     final_paper = f"""\
@@ -115,4 +106,4 @@ SECTION C (15 marks × 1 = 15 marks)
 """
 
     save_to_pdf("Question_Paper.pdf", final_paper)
-    print("✅ Question Paper generated: Question_Paper.pdf")
+    return "Question_Paper.pdf"
