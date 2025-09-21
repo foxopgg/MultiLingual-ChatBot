@@ -130,3 +130,7 @@ conda activate rag-chatbot
 streamlit run frontend/app.py
 ```
 This will open a new tab in your web browser with the chatbot interface. You can now start asking questions.
+
+
+
+credits @Sanjjjayyy
